@@ -1,0 +1,22 @@
+// Failed Sign-In Detection
+// Run against the SigninLogs table in a Log Analytics workspace that's ingesting
+// Entra ID sign-in logs (Entra ID > Diagnostic settings > send to Log Analytics workspace).
+//
+// Flags users with repeated failed sign-ins in a short window - a common indicator
+// of brute-force or password-spray activity.
+
+SigninLogs
+| where TimeGenerated > ago(24h)
+| where ResultType != "0"  // non-zero ResultType indicates a failed sign-in
+| summarize FailedAttempts = count(), 
+            FirstAttempt = min(TimeGenerated), 
+            LastAttempt = max(TimeGenerated),
+            IPAddresses = make_set(IPAddress)
+    by UserPrincipalName
+| where FailedAttempts >= 5
+| order by FailedAttempts desc
+
+// Tuning note: 5 attempts / 24h is a starting threshold for a lab environment.
+// In production this would be tuned against your tenant's actual sign-in volume
+// and paired with IP reputation data to reduce false positives from users who
+// simply mistyped a password.
