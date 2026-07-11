@@ -1,20 +1,23 @@
 {
   "Name": "VM Operator - No Delete",
+  "Description": "Can start, restart, and deallocate virtual machines. Cannot delete VMs, modify VM configuration, or manage access control.",
   "IsCustom": true,
-  "Description": "Can start, restart, and deallocate virtual machines. Cannot delete VMs, modify VM configuration, or manage access control. Models a helpdesk/operations role that needs power-state control without infrastructure-destructive permissions.",
-  "Actions": [
-    "Microsoft.Compute/virtualMachines/start/action",
-    "Microsoft.Compute/virtualMachines/restart/action",
-    "Microsoft.Compute/virtualMachines/deallocate/action",
-    "Microsoft.Compute/virtualMachines/read",
-    "Microsoft.Compute/virtualMachines/instanceView/read",
-    "Microsoft.Resources/subscriptions/resourceGroups/read"
-  ],
-  "NotActions": [],
-  "DataActions": [],
-  "NotDataActions": [],
   "AssignableScopes": [
-    "/subscriptions/<YOUR_SUBSCRIPTION_ID>"
+    "/subscriptions/ecaf1357-8b2a-4d0e-8aa8-de36fff1bee1"
   ],
-  "_notes": "Replace <YOUR_SUBSCRIPTION_ID> with your actual subscription ID before deploying (az account show --query id). Note this role intentionally omits Microsoft.Compute/virtualMachines/write and /delete - power actions like start/restart/deallocate are separate operations from the general write permission, so this role cannot reconfigure or destroy the VM."
+  "Permissions": [
+    {
+      "Actions": [
+        "Microsoft.Compute/virtualMachines/start/action",
+        "Microsoft.Compute/virtualMachines/restart/action",
+        "Microsoft.Compute/virtualMachines/deallocate/action",
+        "Microsoft.Compute/virtualMachines/read",
+        "Microsoft.Compute/virtualMachines/instanceView/read",
+        "Microsoft.Resources/subscriptions/resourceGroups/read"
+      ],
+      "NotActions": [],
+      "DataActions": [],
+      "NotDataActions": []
+    }
+  ]
 }

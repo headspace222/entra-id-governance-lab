@@ -1,20 +1,23 @@
 {
   "Name": "Storage Reader-Only",
+  "Description": "Read-only access to storage account metadata and blob container contents. No write, delete, or key-management access.",
   "IsCustom": true,
-  "Description": "Read-only access to storage account metadata and blob container contents. No write, delete, or key-management access. Models an auditor, reporting tool, or read-only integration that needs visibility without any ability to modify data.",
-  "Actions": [
-    "Microsoft.Storage/storageAccounts/read",
-    "Microsoft.Storage/storageAccounts/blobServices/read",
-    "Microsoft.Storage/storageAccounts/blobServices/containers/read",
-    "Microsoft.Resources/subscriptions/resourceGroups/read"
-  ],
-  "NotActions": [],
-  "DataActions": [
-    "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read"
-  ],
-  "NotDataActions": [],
   "AssignableScopes": [
-    "/subscriptions/<YOUR_SUBSCRIPTION_ID>"
+    "/subscriptions/ecaf1357-8b2a-4d0e-8aa8-de36fff1bee1"
   ],
-  "_notes": "Replace <YOUR_SUBSCRIPTION_ID> with your actual subscription ID before deploying. DataActions (blob read) are separate from control-plane Actions (metadata read) in Azure RBAC - this role intentionally includes only the data-plane read action, not listkeys/action or any write/delete, so a holder of this role can read blob contents but never obtain the storage account access keys."
+  "Permissions": [
+    {
+      "Actions": [
+        "Microsoft.Storage/storageAccounts/read",
+        "Microsoft.Storage/storageAccounts/blobServices/read",
+        "Microsoft.Storage/storageAccounts/blobServices/containers/read",
+        "Microsoft.Resources/subscriptions/resourceGroups/read"
+      ],
+      "NotActions": [],
+      "DataActions": [
+        "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read"
+      ],
+      "NotDataActions": []
+    }
+  ]
 }
