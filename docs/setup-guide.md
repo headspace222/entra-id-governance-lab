@@ -22,33 +22,46 @@ See `security-defaults/security-defaults-notes.md` for full detail.
 
 ## Step 3 — Deploy the Custom RBAC Roles
 
-Requires Azure CLI (`az`) installed and logged in (`az login`).
+Uses Azure PowerShell (the `Az` module) rather than Azure CLI - more reliable across
+multi-tenant accounts, and what this lab was actually built and tested with.
 
-```bash
-# Get your subscription ID
-az account show --query id -o tsv
+```powershell
+# Install the Az module if not already present
+Install-Module -Name Az -Scope CurrentUser -Repository PSGallery -Force
+
+# Connect - if your account spans multiple tenants, target the correct one explicitly
+Connect-AzAccount -Tenant "<your-tenant-id>"
+
+# Set and confirm the active subscription context
+Set-AzContext -SubscriptionId "<your-subscription-id>"
+Get-AzContext
 
 # Edit both JSON files in rbac/custom-roles/ - replace <YOUR_SUBSCRIPTION_ID>
-# with the value above
+# with your actual subscription ID (must match what Get-AzContext shows above)
 
-# Create the roles
-az role definition create --role-definition rbac/custom-roles/vm-operator-no-delete.json
-az role definition create --role-definition rbac/custom-roles/storage-reader-only.json
+cd C:\entra-id-governance-lab
+New-AzRoleDefinition -InputFile "rbac\custom-roles\vm-operator-no-delete.json"
+New-AzRoleDefinition -InputFile "rbac\custom-roles\storage-reader-only.json"
 
 # Confirm they exist
-az role definition list --custom-role-only true --query "[].roleName" -o table
+Get-AzRoleDefinition -Custom | Select-Object Name, Id
 ```
 
-📸 **Screenshot 4:** Both custom roles listed in Azure Portal (IAM → Roles, filtered to
-custom roles), or the CLI output from the list command above.
+**Schema note:** the JSON files in this repo use the `Permissions` array format
+(`{"Permissions": [{"Actions": [...], ...}]}`), not the older flattened format
+(`{"Actions": [...]}` at the root). Az PowerShell versions from roughly 14.x onward
+require the nested format - if `New-AzRoleDefinition` throws `Invalid value for
+Permissions` or a null-reference error, check which format your file is in against
+the examples in `rbac/custom-roles/`.
+
+📸 **Screenshot 4:** Both custom roles listed via `Get-AzRoleDefinition -Custom`, or
+in Azure Portal under Subscription → Access control (IAM) → Roles, filtered to
+custom roles.
 
 ## Step 4 — Assign a Custom Role to a Test User/Resource Group
 
-```bash
-az role assignment create \
-  --assignee <test-user-object-id-or-upn> \
-  --role "VM Operator - No Delete" \
-  --scope /subscriptions/<sub-id>/resourceGroups/<resource-group-name>
+```powershell
+New-AzRoleAssignment -SignInName "<test-user-upn>" -RoleDefinitionName "VM Operator - No Delete" -Scope "/subscriptions/<sub-id>/resourceGroups/<resource-group-name>"
 ```
 
 📸 **Screenshot 5:** Role assignment visible in Azure Portal IAM blade for the resource
@@ -83,10 +96,16 @@ small non-zero cost, unlike everything else in this lab.
 ## Step 8 — Run a Quarterly Access Review
 
 Follow `rbac/access-review-checklist.md` end to end at least once, even on a
-compressed timeline for the lab, to produce a real findings document.
+compressed timeline for the lab, to produce a real findings document. Use
+`scripts/export-rbac-assignments.ps1` to generate the export referenced in that
+checklist:
 
-📸 **Screenshot 11:** Terminal output of `az role assignment list --all`, or the
-findings markdown file itself, referenced in the repo.
+```powershell
+.\scripts\export-rbac-assignments.ps1
+```
+
+📸 **Screenshot 11:** PowerShell output of `Get-AzRoleAssignment`, or the findings
+markdown file itself, referenced in the repo.
 
 ## Step 9 — Drop Screenshots In and Reference Them
 
@@ -99,7 +118,7 @@ the README:
 
 ## Step 10 — Commit and Push
 
-```bash
+```powershell
 git add .
 git commit -m "Rebuild scope for free tier: Azure RBAC, Security Defaults, sign-in monitoring"
 git push
