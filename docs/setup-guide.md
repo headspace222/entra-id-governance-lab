@@ -1,73 +1,130 @@
 # Setup Guide
 
-Everything here works on a genuinely free Azure/Entra ID subscription - no P1/P2
-trial required.
+This guide reproduces the entire lab from a blank Azure/Entra ID free subscription.
+Every step below was executed against a live tenant during this project's build -
+this is a record of what actually worked, including the tooling switch documented in
+docs/architecture.md, not an idealised version of events.
 
-## Step 1 — Enable Security Defaults
+**Estimated time:** 60-90 minutes for a first pass, most of it Azure portal
+navigation rather than active work.
 
-See `security-defaults/security-defaults-notes.md` for full detail.
+## Step 1 - Enable Security Defaults
 
-Screenshot 1: Security defaults toggle enabled (Entra ID -> Properties).
-Screenshot 2: MFA enforcement challenge screen.
+Full detail: security-defaults/security-defaults-notes.md.
 
-## Step 2 — Create a Break-Glass Account
+1. Entra ID -> Overview -> Properties
+2. Manage security defaults -> set to Enabled -> Save
 
-1. Entra ID -> Users -> New user -> e.g. breakglass-emergency-admin
-2. Assign Global Administrator directly (permanent)
-3. Register MFA on this account too, store credentials offline
+Note: many tenants created after October 2019 have this enabled by default - check
+before assuming a change is needed.
 
-Screenshot 3: Break-glass account with Global Administrator role assignment visible.
+**Evidence to capture:**
+- 01-security-defaults-enabled.png - the Properties page showing the toggle state
+- 02-mfa-enforcement.png - the MFA challenge screen triggered during a live sign-in
+  (open an incognito window, sign in as any user, and capture the Authenticator
+  approval prompt)
 
-## Step 3 — Deploy the Custom RBAC Roles
+## Step 2 - Create a Break-Glass Account
 
-Uses Azure PowerShell (the Az module).
+1. Entra ID -> Users -> New user -> name it clearly
+   (e.g. breakglass-emergency-admin)
+2. Assigned roles -> Add assignments -> Global Administrator, assigned
+   permanently - not via any eligibility or time-bound mechanism
+3. Register MFA on this account; store its credentials in a password manager, kept
+   separate from day-to-day admin credentials
+
+**Evidence to capture:**
+- 03-breakglass-account.png - the account's Assigned roles page
+
+## Step 3 - Deploy the Custom RBAC Roles
+
+This lab uses Azure PowerShell (the Az module), not Azure CLI - see
+docs/architecture.md for why, if you hit the same CLI issue.
 
 ```powershell
 Install-Module -Name Az -Scope CurrentUser -Repository PSGallery -Force
 Connect-AzAccount -Tenant "<your-tenant-id>"
 Set-AzContext -SubscriptionId "<your-subscription-id>"
 Get-AzContext
+```
 
+Edit both files in rbac/custom-roles/, replacing <YOUR_SUBSCRIPTION_ID> with the
+value confirmed above, then:
+
+```powershell
 cd C:\entra-id-governance-lab
 New-AzRoleDefinition -InputFile "rbac\custom-roles\vm-operator-no-delete.json"
 New-AzRoleDefinition -InputFile "rbac\custom-roles\storage-reader-only.json"
 Get-AzRoleDefinition -Custom | Select-Object Name, Id
 ```
 
-Screenshot 4: Both custom roles listed.
+**Schema note:** these JSON files use the Permissions array format, required by
+current Az.Resources module versions.
 
-## Step 4 — Assign a Custom Role
+**Evidence to capture:**
+- 04-custom-roles-list.png - the Get-AzRoleDefinition -Custom output, or the
+  equivalent Portal view
+
+## Step 4 - Assign a Role and Verify the Boundary
 
 ```powershell
-New-AzRoleAssignment -ObjectId "<object-id>" -RoleDefinitionName "VM Operator - No Delete" -Scope "/subscriptions/<sub-id>/resourceGroups/<rg-name>"
+New-AzResourceGroup -Name "rg-governance-lab" -Location "<your-region>"
+Get-AzADUser -UserPrincipalName "<upn>" | Select-Object DisplayName, Id
+New-AzRoleAssignment -ObjectId "<object-id>" -RoleDefinitionName "VM Operator - No Delete" -Scope "/subscriptions/<sub-id>/resourceGroups/rg-governance-lab"
 ```
 
-Screenshot 5: Role assignment visible in IAM.
-Screenshot 6: The custom role's Permissions/JSON view showing no delete action.
+**Evidence to capture:**
+- 05-role-assignment-check-access.png - IAM Role assignments showing the assignment
+- 06-vm-operator-role-permissions.png - the custom role's Permissions/JSON tab,
+  showing no delete or write action present - a structural boundary check chosen
+  deliberately over a live resource test.
 
-## Step 5 — Sign-In Monitoring
+## Step 5 - Sign-In Monitoring
 
-See monitoring/sign-in-monitoring.md.
+Full detail: monitoring/sign-in-monitoring.md.
 
-Screenshot 7: Sign-in logs filtered by Status: Failure.
-Screenshot 8: Sign-in logs filtered by legacy auth client types.
+1. Entra ID -> Monitoring & health -> Sign-in logs
+2. Add filter -> Status -> Failure
 
-## Step 6 — Run a Quarterly Access Review
+**Evidence to capture:**
+- 07-failed-signins-filtered.png
+
+3. Clear that filter, then Add filter -> Client app -> Legacy Authentication Clients
+
+**Evidence to capture:**
+- 08-legacy-auth-filter.png - "No sign-ins found" is the correct outcome here.
+
+**Optional (P1/P2 required):** monitoring/kql-queries/ documents the Log Analytics
+equivalent.
+
+## Step 6 - Run a Quarterly Access Review
 
 ```powershell
 .\scripts\export-rbac-assignments.ps1
 ```
 
-Screenshot 9: PowerShell output of the export, or the findings markdown file.
+**Evidence to capture:**
+- 09-access-review-export.png
 
-## Step 7 — Drop Screenshots In
-
-Save into docs/screenshots/ as 0X-description.png.
-
-## Step 8 — Commit and Push
+## Step 7 - Finalise and Push
 
 ```powershell
-git add .
-git commit -m "Rebuild scope for free tier: Azure RBAC, Security Defaults, sign-in monitoring"
+cd C:\entra-id-governance-lab
+git add -A
+git commit -m "Complete lab build: RBAC roles deployed, monitoring verified, evidence captured"
 git push
 ```
+
+## A Note on What Went Wrong Along the Way
+
+This build did not go in a straight line, and that's worth being transparent about
+rather than editing out. The original design targeted Conditional Access and PIM;
+licensing trial provisioning proved unreliable enough to force a scope redesign
+around Azure RBAC and native log filtering instead. Azure CLI hit a reproducible bug
+on this account's multi-tenant configuration, resolved by switching to Azure
+PowerShell. A live VM test for the RBAC boundary was abandoned after repeated Azure
+capacity restrictions on B-series sizes, replaced with structural role-definition
+verification. Every one of these was a real constraint encountered during a genuine
+build, not a scripted scenario - and the resolution in each case is documented in
+docs/architecture.md alongside the reasoning, because that reasoning is the actual
+skill being demonstrated here.
