@@ -1,18 +1,8 @@
-// Legacy Authentication Attempt Detection
-// Run against the SigninLogs table in a Log Analytics workspace.
-//
-// Even without a Conditional Access policy to actively block legacy auth (P1 feature),
-// this query surfaces any legacy protocol usage so it can be investigated and the
-// affected account/app migrated to modern auth manually.
+// OPTIONAL - Requires Entra ID P1 or P2. Free-tier equivalent: native sign-in log
+// filtering by Client app - see monitoring/sign-in-monitoring.md.
 
 SigninLogs
 | where TimeGenerated > ago(7d)
 | where ClientAppUsed in ("Exchange ActiveSync", "IMAP4", "POP3", "SMTP", "Other clients", "AutoDetect")
 | project TimeGenerated, UserPrincipalName, ClientAppUsed, AppDisplayName, IPAddress, ResultType, Location
 | order by TimeGenerated desc
-
-// Follow-up: any UserPrincipalName appearing here is a candidate for:
-//   1. Confirming whether legacy auth is actually required for their workflow
-//   2. Migrating them to a modern-auth-capable client
-//   3. If migration isn't possible, documenting it as an accepted risk with compensating
-//      controls (e.g. IP allowlisting at the app/service level)

@@ -3,7 +3,7 @@
   "Description": "Read-only access to storage account metadata and blob container contents. No write, delete, or key-management access.",
   "IsCustom": true,
   "AssignableScopes": [
-    "/subscriptions/ecaf1357-8b2a-4d0e-8aa8-de36fff1bee1"
+    "/subscriptions/<YOUR_SUBSCRIPTION_ID>"
   ],
   "Permissions": [
     {
