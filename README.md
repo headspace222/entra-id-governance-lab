@@ -83,39 +83,50 @@ Evidence of every control below, captured against a live Azure/Entra ID tenant
 during this build. Files live in docs/screenshots/.
 
 **1. Security Defaults Enabled**
+
 ![Security Defaults enabled](docs/screenshots/01-security-defaults-enabled.png)
 Entra ID Properties confirming the tenant-wide MFA baseline is active.
 
 **2. MFA Enforcement in Action**
+
 ![MFA enforcement challenge](docs/screenshots/02-mfa-enforcement.png)
 A live Authenticator approval challenge intercepting a sign-in attempt.
 
 **3. Break-Glass Account**
+
 ![Break-glass account role assignment](docs/screenshots/03-breakglass-account.png)
 Emergency access account with permanent Global Administrator assignment.
 
 **4. Custom RBAC Roles Deployed**
+
 ![Custom RBAC roles list](docs/screenshots/04-custom-roles-list.png)
+
 Both least-privilege custom roles confirmed live in the subscription.
 
 **5. Role Assignment Verified**
+
 ![Role assignment in IAM](docs/screenshots/05-role-assignment-check-access.png)
 The VM Operator role assigned to a test identity at resource group scope.
 
 **6. Least-Privilege Boundary Verified**
+
 ![VM Operator role permissions](docs/screenshots/06-vm-operator-role-permissions.png)
 The role's full permission set - no delete or write action present anywhere.
 
 **7. Failed Sign-In Detection**
+
 ![Failed sign-ins filtered](docs/screenshots/07-failed-signins-filtered.png)
 Sign-in logs filtered to failed attempts, with error codes and source IPs visible.
 
 **8. Legacy Authentication Check**
+
 ![Legacy auth filter](docs/screenshots/08-legacy-auth-filter.png)
 Sign-in logs filtered to legacy protocol clients - zero results confirms the block is effective.
 
 **9. Access Review Executed**
+
 ![Access review export](docs/screenshots/09-access-review-export.png)
+
 Scripted export of current role assignments, produced for the quarterly review process.
 ## Setup Guide
 
@@ -132,7 +143,7 @@ captured, are in [docs/setup-guide.md](docs/setup-guide.md).
   access control layers
 - Threat modelling access controls against specific attack patterns (credential
   theft, brute-force, legacy-protocol bypass, privilege creep) rather than
-  implementing controls generically
+  implementing controls generically.
 
 **Azure platform engineering**
 - Azure RBAC: custom role definitions (JSON schema), scope assignment, and the
@@ -143,7 +154,7 @@ captured, are in [docs/setup-guide.md](docs/setup-guide.md).
   administration, multi-tenant account navigation
 - Diagnosing and resolving a real Az PowerShell breaking-change (the Permissions
   array schema migration) by reading the tool's own warning output and adapting the
-  JSON structure accordingly, rather than treating a version mismatch as a blocker
+  JSON structure accordingly, rather than treating a version mismatch as a blocker.
 
 **Engineering judgement under real constraints**
 - Recognising when a planned technical approach (Conditional Access, PIM, Log
@@ -156,7 +167,7 @@ captured, are in [docs/setup-guide.md](docs/setup-guide.md).
 - Multi-tenant Azure account troubleshooting: diagnosing tenant/subscription context
   mismatches across the Entra admin center, Microsoft 365 admin center, Azure
   Portal, Azure CLI, and Azure PowerShell - five different surfaces that all needed
-  to agree
+  to agree.
 
 **Documentation and reproducibility**
 - Writing setup documentation precise enough that another engineer (or a future
@@ -165,7 +176,7 @@ captured, are in [docs/setup-guide.md](docs/setup-guide.md).
   plan, in a way that reads as engineering maturity rather than failure
 - Git/GitHub workflow: structured commit history reflecting actual project evolution
   (initial build, licensing constraint discovered, scope redesigned, tooling
-  switched, documentation finalised)
+  switched, documentation finalised).
 
 ## Author
 
