@@ -64,11 +64,11 @@ available.
 
 ## Prerequisites
 
-- Azure free subscription
-- Entra ID Free tier (no P1/P2 required - this is the point)
-- Global Administrator or Owner role during initial setup
+- Azure free subscription.
+- Entra ID Free tier (no P1/P2 required - this is the point).
+- Global Administrator or Owner role during initial setup.
 - Azure PowerShell (Az module) - chosen over Azure CLI after direct comparison; see
-  docs/architecture.md for why
+  docs/architecture.md for why.
 
 ## Cost
 
