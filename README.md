@@ -33,7 +33,7 @@ built without them, on Entra ID Free, for two reasons:
    constraint - and explaining the trade-off honestly - is closer to what a real
    infrastructure role actually asks of you.
 
-`docs/architecture.md` documents exactly what Conditional Access and PIM would add at
+[`docs/architecture.md`](docs/architecture.md) documents exactly what Conditional Access and PIM would add at
 enterprise scale, and how this lab's design extends cleanly once that licensing is
 available.
 
@@ -41,15 +41,15 @@ available.
 
 | Component | Purpose |
 |---|---|
-| `security-defaults/` | Entra ID Security Defaults configuration and enforcement verification |
-| `rbac/custom-roles/` | Two custom Azure RBAC role definitions implementing least privilege, with full design rationale |
-| `rbac/access-review-checklist.md` | A documented, repeatable manual access review process |
-| `monitoring/sign-in-monitoring.md` | Sign-in threat detection via native log filtering - no premium licensing required |
-| `monitoring/kql-queries/` | KQL queries for the Log Analytics / Sentinel-track extension of this same detection logic |
-| `scripts/export-rbac-assignments.ps1` | PowerShell automation for the quarterly access review export |
-| `docs/architecture.md` | Full design rationale, licensing trade-off analysis, and threat model |
-| `docs/setup-guide.md` | Step-by-step reproduction guide with screenshot evidence points |
-| `docs/screenshots/` | Evidence of every control actually deployed and verified in a live tenant |
+| [`security-defaults/`](security-defaults/) | Entra ID Security Defaults configuration and enforcement verification |
+| [`rbac/custom-roles/`](rbac/custom-roles/) | Two custom Azure RBAC role definitions implementing least privilege, with full design rationale |
+| [`rbac/access-review-checklist.md`](rbac/access-review-checklist.md) | A documented, repeatable manual access review process |
+| [`monitoring/sign-in-monitoring.md`](monitoring/sign-in-monitoring.md) | Sign-in threat detection via native log filtering - no premium licensing required |
+| [`monitoring/kql-queries/`](monitoring/kql-queries/) | KQL queries for the Log Analytics / Sentinel-track extension of this same detection logic |
+| [`scripts/export-rbac-assignments.ps1`](scripts/export-rbac-assignments.ps1) | PowerShell automation for the quarterly access review export |
+| [`docs/architecture.md`](docs/architecture.md) | Full design rationale, licensing trade-off analysis, and threat model |
+| [`docs/setup-guide.md`](docs/setup-guide.md) | Step-by-step reproduction guide with screenshot evidence points |
+| [`docs/screenshots/`](docs/screenshots/) | Evidence of every control actually deployed and verified in a live tenant |
 
 ## Threat Model
 
