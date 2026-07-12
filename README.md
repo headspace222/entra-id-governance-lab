@@ -77,6 +77,46 @@ resources. The one optional extension - Log Analytics diagnostic export and a
 scheduled alert rule - is clearly marked as requiring P1/P2 and carrying a small
 per-rule cost, and is not part of the default build.
 
+## Screenshots
+
+Evidence of every control below, captured against a live Azure/Entra ID tenant
+during this build. Files live in docs/screenshots/.
+
+**1. Security Defaults Enabled**
+![Security Defaults enabled](docs/screenshots/01-security-defaults-enabled.png)
+Entra ID Properties confirming the tenant-wide MFA baseline is active.
+
+**2. MFA Enforcement in Action**
+![MFA enforcement challenge](docs/screenshots/02-mfa-enforcement.png)
+A live Authenticator approval challenge intercepting a sign-in attempt.
+
+**3. Break-Glass Account**
+![Break-glass account role assignment](docs/screenshots/03-breakglass-account.png)
+Emergency access account with permanent Global Administrator assignment.
+
+**4. Custom RBAC Roles Deployed**
+![Custom RBAC roles list](docs/screenshots/04-custom-roles-list.png)
+Both least-privilege custom roles confirmed live in the subscription.
+
+**5. Role Assignment Verified**
+![Role assignment in IAM](docs/screenshots/05-role-assignment-check-access.png)
+The VM Operator role assigned to a test identity at resource group scope.
+
+**6. Least-Privilege Boundary Verified**
+![VM Operator role permissions](docs/screenshots/06-vm-operator-role-permissions.png)
+The role's full permission set - no delete or write action present anywhere.
+
+**7. Failed Sign-In Detection**
+![Failed sign-ins filtered](docs/screenshots/07-failed-signins-filtered.png)
+Sign-in logs filtered to failed attempts, with error codes and source IPs visible.
+
+**8. Legacy Authentication Check**
+![Legacy auth filter](docs/screenshots/08-legacy-auth-filter.png)
+Sign-in logs filtered to legacy protocol clients - zero results confirms the block is effective.
+
+**9. Access Review Executed**
+![Access review export](docs/screenshots/09-access-review-export.png)
+Scripted export of current role assignments, produced for the quarterly review process.
 ## Setup Guide
 
 Full reproduction steps, including exactly where each piece of evidence was
